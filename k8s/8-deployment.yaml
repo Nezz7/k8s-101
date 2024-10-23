@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: mysecret
+      containers:
+      - name: go-server
+        image: go-server:v1
+        # env:
+        #   - name: NAME
+        #     valueFrom:
+        #       configMapKeyRef:
+        #         name: myconfig
+        #         key: NAME
+        envFrom:
+          - configMapRef:
+              name: myconfig
+        volumeMounts:
+        - name: secret-volume
+          readOnly: true
+          mountPath: /var/secrets
+  strategy:
+    type: Recreate
+  # strategy:
+  #   type: RollingUpdate
+  #   rollingUpdate:
+  #     maxUnavailable: 1
+  #     maxSurge: 3

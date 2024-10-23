@@ -1,0 +1,29 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+  namespace: demo
+  labels:
+    name: mypod
+spec:
+  volumes:
+    - name: secret-volume
+      secret:
+        secretName: mysecret
+  containers:
+  - name: go-server
+    image: go-server:v1
+    # env:
+    #   - name: NAME
+    #     valueFrom:
+    #       configMapKeyRef:
+    #         name: myconfig
+    #         key: NAME
+    envFrom:
+      - configMapRef:
+          name: wrongname
+    volumeMounts:
+    - name: secret-volume
+      readOnly: true
+      mountPath: /var/secrets
